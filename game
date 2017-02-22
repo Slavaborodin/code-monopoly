@@ -1,0 +1,153 @@
+// Viacheslav Borodin 15464068
+// Muireadach Mac Mahon 15559007
+// George Sidorov 15375551
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Timer;
+
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JOptionPane;
+
+public class Game {
+
+	//Constants
+	public static int WINDOW_WIDTH = 1366;
+	public static int WINDOW_HEIGHT = 768;
+	public static int COMMAND_BOX_HEIGHT = 30;
+	public static int UPDATE_TIMER_MILIS = 1000; 
+	public static int COMMAND_BOX_WIDTH = 100;
+	public static int AMOUNT_OF_PLAYERS = 6;
+	
+	
+	public static void main(String[] args) {
+		
+		// All Window Configuration
+		JFrame window = new JFrame("Monopoly Board Game");
+		window.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		GamePanel gamePane = new GamePanel(AMOUNT_OF_PLAYERS);
+		gamePane.setMaximumSize(new Dimension(700, WINDOW_HEIGHT));
+		
+		InformationPanel informationPanel = new InformationPanel(WINDOW_WIDTH-700, WINDOW_HEIGHT);
+		informationPanel.setMaximumSize(new Dimension(WINDOW_WIDTH-700, WINDOW_HEIGHT));
+		
+		gamePane.setAlignmentX( Component.LEFT_ALIGNMENT );
+		informationPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setMaximumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT-COMMAND_BOX_HEIGHT));
+		panel.add(gamePane);
+		panel.add(informationPanel);
+		
+		CommandBoxPanel textBox = new CommandBoxPanel(informationPanel.getTextLog(), WINDOW_WIDTH, COMMAND_BOX_HEIGHT);
+		textBox.setMaximumSize(new Dimension(WINDOW_WIDTH, COMMAND_BOX_HEIGHT));
+		textBox.setBackground(Color.WHITE);
+		
+		JPanel containingPanel = new JPanel();
+		containingPanel.setLayout(new BoxLayout(containingPanel, BoxLayout.Y_AXIS));
+		containingPanel.add(panel);
+		containingPanel.add(textBox);
+		
+		window.setContentPane(containingPanel);
+		window.setVisible(true);
+		
+		System.out.println("Finished Loading");
+		
+		Thread th = new Thread()
+		{
+		    public void run() {
+		    	boolean running = true;
+				long time;
+				while(running){
+					time = System.currentTimeMillis();
+					if(System.currentTimeMillis() - time > UPDATE_TIMER_MILIS){
+						window.repaint();
+						time = System.currentTimeMillis();
+					}
+				}
+		    }
+		};
+		th.start();
+		
+		
+		// for loop to move the amount of players our case 2-6 
+		for(int i = 0; i < AMOUNT_OF_PLAYERS; i++){
+			//calls on the function from gamepane to move the token 
+			gamePane.loopToken(i);
+		}
+		
+		/*
+		int i = 1;
+		 		String numberofplayers;
+		 		String names="";
+				numberofplayers = JOptionPane.showInputDialog("How many players?");
+		 	int totalplayers = Integer.parseInt(numberofplayers);
+		 		if(totalplayers < 2 || totalplayers > 6)
+		 		{
+					JOptionPane.showMessageDialog(null, "Please enter valid number of players");
+		 		System.exit(0);
+		 		}
+			JOptionPane.showMessageDialog(null, "There are " + totalplayers + " players playing");
+	 		
+		 		while(i <= totalplayers)
+		 		{
+		 			names = JOptionPane.showInputDialog("Enter player " +i);
+				i++;
+					
+		 	}
+		 		
+		 		
+		 		
+		 int [] balance = new int[6];
+		 
+		 balance [0] = 1500; 
+		 balance [1] = 1500; 
+		 balance [2] = 1500;
+		 balance [3] = 1500; 
+		 balance [4] = 1500;
+		 balance [5] = 1500; 
+		 
+		 String stringArr[] = names.split("");
+		 
+		 if ( stringArr[1]!=null ){
+			 JOptionPane.showMessageDialog(null,"Player 1 has a starting balance of £"+balance[0]);
+			 
+		 }
+		 
+		 if (stringArr[2]!=null){
+			 JOptionPane.showMessageDialog(null,"Player 2 has a starting balance of £"+balance[1]);
+		 }
+		 
+		 if (stringArr[3]!=null ){
+			 JOptionPane.showMessageDialog(null,"Player 3 has a starting balance of £"+balance[2]);
+		 }
+		 
+		 if (stringArr[4]!=null){
+			 JOptionPane.showMessageDialog(null,"Player 4 has a starting balance of £"+balance[3]);
+			 
+		 }
+		 
+		 if (stringArr[5]!=null)
+		 {
+			 JOptionPane.showMessageDialog(null, "Player 5 has a starting balance of £"+balance[4]);
+			 
+		 }
+		 
+		 if (stringArr[6]!=null)
+		 {
+			 JOptionPane.showMessageDialog(null, "Player 6 has a starting balance of £"+balance[5]);
+		 }*/
+		 	
+	}
+}
