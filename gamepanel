@@ -1,0 +1,184 @@
+// Viacheslav Borodin 15464068
+// Muireadach Mac Mahon 15559007
+// George Sidorov 15375551
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+// opening of image 
+public class GamePanel extends JPanel {
+
+	// buffer image
+	BufferedImage img = null;
+	Token[] tokens;
+	// creating player tokens
+	private int THREAD_SLEEP_TIME_MS = 500;
+	Thread th;
+	// array for positions
+
+	//3 d array for a token, x,y coordinate
+	public static int[][][] positions = { 
+			//CO-ordinates token 1
+			{  { 40, 580 }, { 40, 527 }, { 40, 478 }, { 40, 414 },
+			{ 40, 351 }, { 40, 293 }, { 40, 238 }, { 40, 182 }, { 40, 128 }, { 17, 72 }, { 119, 50 }, { 181, 50 },
+			{ 232, 50 }, { 288, 50 }, { 343, 50 }, { 417, 50 }, { 455, 50 }, { 515, 50 }, { 575, 50 }, { 675, 50 },
+			{ 675, 129 }, { 675, 184 }, { 675, 233 }, { 675, 291 }, { 675, 354 }, { 675, 402 }, { 675, 443 },
+			{ 675, 528 }, { 675, 575 }, { 650, 646 }, { 573, 660 }, { 526, 660 }, { 466, 660 }, { 409, 660 },
+			{ 341, 660 }, { 287, 660 }, { 237, 660 }, { 185, 660 }, { 120, 660 } ,{ 40, 678 }},
+
+			//CO-ordinates token 2
+			{  { 30, 589 }, { 30, 503 }, { 30, 458 }, { 30, 414 }, { 30, 358 }, { 30, 306 }, { 30, 242 },
+					{ 30, 191 }, { 30, 122 }, { 19, 54 }, { 119,45  }, { 168, 45 }, { 242, 45 }, { 283, 45 },
+					{ 353, 45 }, { 403, 45 }, { 461, 45 }, { 530, 45 }, { 582, 45 }, { 642, 45 }, { 650, 122 },
+					{ 670, 177 }, { 670, 228 }, { 670, 283 }, { 670, 350 }, { 670, 396 }, { 670, 459 }, { 670, 512 },
+					{ 670, 570 }, { 670, 636 }, { 581, 635 }, { 517, 635 }, { 468, 635 }, { 402, 635 }, { 345, 635 },
+					{ 283, 635 }, { 230, 635 }, { 180, 635 }, { 125, 635 },{ 40, 668 } },
+
+			//CO-ordinates token 3
+			{  { 25, 592 }, { 25, 505 }, { 25, 454 }, { 25, 400 }, { 25, 343 }, { 25, 284 }, { 25, 225 },
+					{ 25, 164 }, { 25, 114 }, { 25, 18 }, { 127, 40 }, { 175, 40 }, { 227, 40 }, { 283, 40 },
+					{ 349, 40 }, { 404, 40 }, { 472, 40 }, { 520, 40 }, { 590, 40 }, { 657, 40 }, { 665, 113 },
+					{ 665, 180 }, { 665, 246 }, { 665, 295 }, { 665, 350 }, { 665, 409 }, { 665, 466 }, { 665, 515 },
+					{ 665, 588 }, { 650, 650 }, { 567, 640 }, { 522, 640 }, { 454, 640 }, { 399, 640 }, { 341, 640 },
+					{ 287, 640 }, { 233, 640 }, { 171, 640 }, { 127	, 640 },{ 22, 670 } },
+
+			//CO-ordinates token 4
+			{  { 50, 579 }, { 50,524 }, { 50, 458 }, { 50, 398 }, { 50, 344 }, { 50, 286 }, { 50, 231 },
+					{ 50, 170 }, { 50, 116 }, { 19, 19 }, { 121, 35 }, { 169, 35 }, { 232, 35 }, { 296, 35 },
+					{ 346, 35 }, { 406, 35 }, { 462, 35 }, { 519, 35 }, { 581, 35 }, { 660, 35 }, { 660, 117},
+					{ 660, 167 }, { 660, 230 }, { 660, 289 }, { 660, 339 }, { 660, 395 }, { 660, 452 }, { 660, 511 },
+					{ 660, 573 }, { 660, 633 }, { 573,  645}, { 520, 645 }, { 456, 645 }, { 406, 645 }, { 351, 645 },
+					{ 299, 645 }, { 230, 645 }, { 169, 645 }, { 126, 645 },{ 33, 641 } },
+
+			//CO-ordinates token 5
+			{  { 55, 564 }, { 55, 533 }, { 55, 459 }, { 55, 393}, { 55, 341 }, { 55, 291 }, { 55, 222 },
+					{ 55, 180 }, { 55, 119 }, { 19, 30 }, { 125, 30 }, { 186, 30 }, { 236, 30 }, { 303, 50 },
+					{ 354, 30 }, { 407, 30 }, { 462, 30 }, { 532,30 }, { 569,30 }, { 673, 30 }, { 655, 117 },
+					{ 655, 177 }, { 655, 235 }, { 655, 272 }, { 655, 347 }, { 655, 395 }, { 655, 450 }, { 655, 513 },
+					{ 655, 562 }, { 655, 619 }, { 579, 650 }, { 517, 650 }, { 449, 650 }, { 387, 650 }, { 337, 650 },
+					{ 288, 650 }, { 218, 650 }, { 163, 650 }, { 102, 650 } ,{ 28, 678 }},
+
+			//CO-ordinates token 6
+			{ { 45, 568 }, { 45, 510 }, { 45, 450 }, { 45, 391 }, { 45, 345 }, { 45, 276 }, { 45, 227 },
+					{ 45, 167 }, { 45, 114 }, { 75, 20 }, { 136, 25 }, { 192, 25 }, { 248, 25 }, { 300, 25 },
+					{ 357, 25 }, { 406, 25 }, { 465, 25 }, { 518, 25 }, { 578, 25}, { 673, 25 }, { 650, 105 },
+					{ 650, 162 }, { 650, 218 }, { 650, 275 }, { 650, 335 }, { 650, 390 }, { 650, 448 }, { 650, 501 },
+					{ 650, 559 }, { 650, 620 }, { 582, 670 }, { 515, 670 }, {454, 670 }, { 401, 670 }, { 351, 670 },
+					{ 288, 670 }, { 236, 670 }, { 174, 670 }, { 121, 670 } ,{ 27, 627 }}, };
+
+	// ArrayList<BufferedImage> imgs = new ArrayList<BufferedImage>(); USe if
+	// multiple images will be used later
+
+	GamePanel(int amountOfTokens) {
+		this.tokens = createTokens(amountOfTokens);
+		// piece=new int[39][2];
+		// adding the image
+		addImage("C:/Users/Slava Borodin/Documents/COMP20050/Assignment1/monopoly.jpg", 700, 700);
+		// positions = new int[39][2];
+
+		// array for the boxes for the gameboard
+		// th = new Thread()
+		// {
+		// public void run() {
+		// boolean running = true;
+		// int i = 0;
+		// while(running){
+		//
+		// i++;
+		// }
+		// }
+		// };
+		// th.start();
+	}
+
+	public void loopToken(int index) {
+		Token t = tokens[index];
+		// NOTE: position[i].length with i being an integer value within bounds,
+		// will return the length of the second dimensions.
+		for (int i = 0; i < positions[index].length; i++) {
+			// moves the token index(number) to x coordinate , then moves it to y coordinate of positions 
+			t.moveToHere(positions[index][i][0] , positions[index][i][1] );
+			repaint();
+			try {
+				//program has to sleep otherwise token moves too fast 
+				Thread.sleep(THREAD_SLEEP_TIME_MS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		// moves it to the starting position 
+	//	t.moveToHere(positions[index][0][0] , positions[index][0][1]);
+	}
+
+	public void paint(Graphics g) {
+		// painting the image
+		JLabel imageLabel = new JLabel();
+		// adding the image to an imagelabel
+		imageLabel.setIcon(new ImageIcon("C:/Users/Slava Borodin/Documents/COMP20050/Assignment1/monopoly.jpg"));
+		paintImages(g);
+		paintTokens(g);
+	}
+
+	private void paintTokens(Graphics g) {
+		for (Token t : tokens) {
+			t.paint(g);
+		}
+	}
+
+	private void moveOneToken(int x, int y, int tokenIndexNumber) {
+
+		// Token t = tokens.get(tokenIndexNumber);
+		// t.moveToHere(x,y);
+
+	}
+
+	private void paintImages(Graphics g) {
+		// for(BufferedImage i: imgs){
+		// g.drawImage(img, 0, 0, null);
+		// }
+		// ^^ Again multiple Images^^
+		g.drawImage(img, 0, 0, null);
+	}
+
+	private Token[] createTokens(int amount) {
+
+		Token[] returnable = new Token[amount];
+		// inititiates 6 player tokens
+		Color[] colors = { Color.BLUE, Color.BLACK, Color.YELLOW, Color.GREEN, Color.MAGENTA, Color.ORANGE };
+		// ^^ Only six colors needed as per spec ^^
+
+		for (int i = 0; i < amount; i++) {
+			returnable[i] = new Token(i * 12, 620, colors[i % 6]); // Modulo
+																	// avoids
+																	// Out-Of-Bounds
+		}
+
+		return returnable;
+	}
+
+	private void addImage(String filePath, int width, int height) {
+		File f;
+		BufferedImage tmpImg = null;
+		try {
+			// try to add a buffered image
+			f = new File(filePath);
+			tmpImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			tmpImg = ImageIO.read(f);
+
+		} catch (IOException e) {
+			System.out.println("Error" + e);
+		}
+		// imgs.add(img); USe if mulitple images needed later
+		this.img = tmpImg;
+	}
+
+}
